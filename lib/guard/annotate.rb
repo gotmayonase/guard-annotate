@@ -54,20 +54,29 @@ module Guard
     def annotate_tests_flags
       options[:tests] ? "" : "--exclude tests,fixtures"
     end
-
-    def run_annotate
-      UI.info 'Running annotate', :reset => true
+    
+    def run_annotate(paths)
+      annotate_models if paths.any? { |p| p =~ /schema|models/ }
+      annotate_routes if paths.any? { |p| p =~ /routes/ } && annotate_routes?
+      @result
+    end
+    
+    def annotate_models
+      UI.info 'Running annotate models', :reset => true
       started_at = Time.now
       @result = system("bundle exec annotate #{annotate_tests_flags} -p #{annotation_position}")
       Notifier::notify( @result, Time.now - started_at ) if notify?
-
-      if annotate_routes?
-        started_at = Time.now
-        @result = system("bundle exec annotate -r")
-        Notifier::notify( @result, Time.now - started_at ) if notify?
-      end
-
-      @result
+    end
+    
+    def annotate_routes
+      ::Guard.pause
+      
+      started_at = Time.now
+      UI.info 'Running annotate routes', :reset => true
+      @result = system("bundle exec annotate -r")
+      Notifier::notify( @result, Time.now - started_at ) if notify?
+      
+      ::Guard.pause
     end
   end
 end
