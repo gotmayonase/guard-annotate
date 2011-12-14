@@ -26,7 +26,7 @@ module Guard
     end
 
     def reload
-      run_annotate([])
+      true
     end
 
     def run_all
