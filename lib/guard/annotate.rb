@@ -26,7 +26,7 @@ module Guard
     end
 
     def reload
-      run_annotate
+      run_annotate([])
     end
 
     def run_all
@@ -34,7 +34,7 @@ module Guard
     end
 
     def run_on_change( paths=[] )
-      run_annotate
+      run_annotate(paths)
     end
 
     private
